@@ -1,6 +1,7 @@
 use super::exec_async::exec_async;
+use anyhow::Error;
 
-pub async fn list_profiles() -> Result<Vec<String>, String> {
+pub async fn list_profiles() -> Result<Vec<String>, Error> {
     let result = exec_async("aws", &["configure", "list-profiles"]).await;
     match result {
         Ok(s) => {
@@ -11,6 +12,6 @@ pub async fn list_profiles() -> Result<Vec<String>, String> {
                 .collect::<Vec<String>>();
             Ok(profiles)
         }
-        Err(s) => Err(s),
+        Err(s) => Err(Error::msg(s)),
     }
 }
