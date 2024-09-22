@@ -1,5 +1,4 @@
 {
-  "$schema": "https://schema.tauri.app/config/1",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
@@ -8,21 +7,29 @@
   },
   "package": {
     "productName": "ai-chat",
-    "version": "0.1.0"
+    "version": "0.0.0"
   },
   "tauri": {
     "allowlist": {
-      "all": false,
+      "all": true,
+      "http": {
+        "scope": [
+          "https://console.aws.amazon.com*",
+          "https://signin.aws.amazon.com*"
+        ]
+      },
       "shell": {
-        "all": false,
+        "all": true,
+        "execute": true,
+        "sidecar": true,
         "open": true
       }
     },
     "windows": [
       {
-        "title": "ai-chat",
-        "width": 800,
-        "height": 600
+        "title": "AI Chat",
+        "width": 1280,
+        "height": 1024
       }
     ],
     "security": {
@@ -31,7 +38,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.ai-chat.app",
+      "identifier": "com.tauri.dev",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
