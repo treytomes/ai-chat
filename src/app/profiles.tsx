@@ -17,7 +17,7 @@ import { useInterval } from "../components/useInterval";
 import { IdentityTable } from "../components/IdentityTable";
 import { CredentialsTable } from "../components/CredentialsTable";
 
-export default function Home() {
+export default function Profiles() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const loader = useContext(LoaderContext);
 

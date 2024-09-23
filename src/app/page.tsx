@@ -1,19 +1,17 @@
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input, Tab, Tabs } from "@nextui-org/react";
 import { useState } from "react";
+import Chat from "./chat";
+import Profiles from "./profiles";
 
 export default function Home() {
-    const [response, setResponse] = useState('');
-    const [prompt, setPrompt] = useState('');
-
-    const submitPrompt = () => {
-        
-    }
-
     return <div>
-        <pre>
-            { response }
-        </pre>
-        <Input label="prompt>" />
-        <Button>Submit</Button>
+        <Tabs>
+            <Tab title="Chat">
+                <Chat />
+            </Tab>
+            <Tab title="Profiles">
+                <Profiles />
+            </Tab>
+        </Tabs>
     </div>
 }

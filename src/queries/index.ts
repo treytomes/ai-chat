@@ -93,3 +93,7 @@ export const openWebConsole = async (profile: Profile) => {
   const requestUrl = `${FEDERATION_URL}?${requestParameters}`;
   await openUrl(requestUrl);
 };
+
+export const submitPrompt = async (prompt: string, conversationId: string): Promise<string> => {
+  return await invoke("submit_prompt", { prompt, conversationId });
+};
