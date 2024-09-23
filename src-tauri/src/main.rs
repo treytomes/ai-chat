@@ -9,6 +9,7 @@ use std::{fs::File, io::BufReader, io::Write, path::Path};
 use aws::models::{Credentials, Identity};
 use llm::models::Conversation;
 use serde::Serialize;
+use settings::AWS_PROFILE_NAME;
 use webbrowser::{open_browser, Browser};
 use aws::queries;
 
@@ -21,7 +22,7 @@ mod logger_module;
 mod module;
 mod repl_module;
 mod settings;
-use anyhow::{Error, Result};
+use anyhow::Result;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 
@@ -50,11 +51,10 @@ async fn list_profiles() -> Result<Vec<String>, String> {
 }
 
 #[tauri::command(async)]
-async fn login(profile_name: &str) -> Result<String, String> {
-    match queries::login(profile_name).await {
-        Ok(r) => Ok(r),
-        Err(e) => Err(format!("{:?}", e))
-    }
+async fn login(profile_name: &str) -> Result<Credentials, String> {
+    queries::login(profile_name)
+        .await
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -62,18 +62,6 @@ fn open_url(url: &str) {
     if open_browser(Browser::Default, &url).is_ok() {
         println!("Opening url: {}", &url)
     }
-}
-
-async fn is_authenticated() -> bool {
-    match aws::queries::get_caller_identity("sandbox").await {
-        Ok(_) => true,
-        Err(_) => false,
-    }
-}
-
-async fn login_aws(profile_name: &str) -> Result<aws::models::Credentials, Error> {
-    let _ = aws::queries::login(profile_name).await;
-    aws::queries::export_credentials(profile_name).await
 }
 
 #[tauri::command]
@@ -131,9 +119,8 @@ async fn submit_prompt(prompt: &str, conversation_id: &str) -> Result<String, St
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    if !is_authenticated().await {
-        let profile_name = "sandbox";
-        let creds = match login_aws(profile_name).await {
+    if !aws::queries::is_authenticated(AWS_PROFILE_NAME).await {
+        let creds = match aws::queries::login(AWS_PROFILE_NAME).await {
             Ok(result) => result,
             Err(e) => panic!("Unable to login: {}", e)
         };
