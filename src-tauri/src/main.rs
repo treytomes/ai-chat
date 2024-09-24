@@ -82,6 +82,11 @@ async fn submit_prompt(prompt: &str, conversation_id: &str) -> Result<String, St
     }
 }
 
+#[tauri::command]
+async fn load_conversation(conversation_id: &str) -> Result<Conversation, String> {
+    Conversation::from_id(conversation_id).map_err(|e| e.to_string())
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     if !aws::queries::is_authenticated(AWS_PROFILE_NAME).await {
@@ -95,12 +100,18 @@ async fn main() -> Result<()> {
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
+            // AWS Authentication
             export_credentials,
             get_caller_identity,
             list_profiles,
             login,
-            open_url,
+
+            // AI Chat
             submit_prompt,
+            load_conversation,
+
+            // Misc
+            open_url,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
