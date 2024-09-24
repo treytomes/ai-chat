@@ -66,54 +66,19 @@ fn open_url(url: &str) {
 
 #[tauri::command]
 async fn submit_prompt(prompt: &str, conversation_id: &str) -> Result<String, String> {
-    let path = Path::new("conversations");
-    if !path.exists() {
-        let _ = fs::create_dir_all("conversations");
-    }
-    let path = path.join(format!("{}.json", conversation_id));
-    let path = path.as_path();
-
-    let conversation = match path.exists() {
-        true => {
-            match File::open(path) {
-                Ok(file) => {
-                    let reader = BufReader::new(file);
-        
-                    // Read the JSON contents of the file as an instance of `User`.
-                    match serde_json::from_reader(reader) {
-                        Ok(c) => Ok(c),
-                        Err(e) => Err(e.to_string()),
-                    }
-                },
-                Err(e) => Err(e.to_string()),
-            }
-        },
-        false => Ok(Conversation::new())
+    let mut conversation = match Conversation::from_id(conversation_id) {
+        Ok(c) => c,
+        Err(_) => Conversation::new()
     };
 
-    match conversation {
-        Ok(mut conversation) => {
-            match llm::queries::submit_prompt(prompt, &mut conversation).await {
-                Ok(response) => {
-                    match serde_json::to_string(&conversation) {
-                        Ok(json_text) => {
-                            match File::create(path) {
-                                Ok(mut file) => {
-                                    match file.write_all(json_text.as_bytes()) {
-                                        Ok(_) => Ok(response),
-                                        Err(e) => Err(e.to_string()),
-                                    }
-                                },
-                                Err(e) => Err(e.to_string()),
-                            }
-                        },
-                        Err(e) => Err(e.to_string())
-                    }
-                },
-                Err(e) => Err(e.to_string()),
+    match llm::queries::submit_prompt(prompt, &mut conversation).await {
+        Ok(response) => {
+            match conversation.save(conversation_id) {
+                Ok(_) => Ok(response),
+                Err(e) => Err(e.to_string())
             }
         },
-        Err(e) => Err(e),
+        Err(e) => Err(e.to_string()),
     }
 }
 

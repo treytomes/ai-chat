@@ -2,6 +2,7 @@ import { Button, Input } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import * as queries from "../queries";
 import { uuid } from 'uuidv4';
+import Markdown from "../components/Markdown";
 
 export default function Chat() {
     const [response, setResponse] = useState('');
@@ -23,9 +24,7 @@ export default function Chat() {
     }
 
     return <div>
-        <pre>
-            { response }
-        </pre>
+        <Markdown text={response} isLoading={false} onRenderComplete={undefined} />
         <Input label="prompt>" value={prompt} onValueChange={setPrompt} />
         <Button onPress={submitPrompt}>Submit</Button>
     </div>
