@@ -16,6 +16,8 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { delay } from "../util";
 import { Conversation } from "../models/conversation";
 import { ConversationDto } from "../models/conversation-dto";
+
+
 const FEDERATION_URL = "https://signin.aws.amazon.com/federation";
 const CONSOLE_URL = "https://console.aws.amazon.com";
 const DEFAULT_SESSION_DURATION = 12 * 60 * 60;
