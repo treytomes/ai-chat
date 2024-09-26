@@ -7,11 +7,12 @@ use std::{env, fs};
 use std::{fs::File, io::BufReader, io::Write, path::Path};
 
 use aws::models::{Credentials, Identity};
-use llm::models::Conversation;
+use llm::models::{Conversation, Message};
 use serde::Serialize;
 use settings::AWS_PROFILE_NAME;
 use webbrowser::{open_browser, Browser};
 use aws::queries;
+use tauri::{AppHandle, Manager};
 
 extern crate ini;
 
@@ -25,6 +26,17 @@ mod settings;
 use anyhow::Result;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+struct SubmitPromptPayload {
+    prompt: String,
+    conversation_id: String,
+}
+
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+struct ChatResponsePayload {
+    response: String,
+}
 
 #[tauri::command(async)]
 async fn export_credentials(profile_name: &str) -> Result<Credentials, String> {
@@ -65,7 +77,7 @@ fn open_url(url: &str) {
 }
 
 #[tauri::command]
-async fn submit_prompt(prompt: &str, conversation_id: &str) -> Result<String, String> {
+async fn submit_prompt(app_handle: AppHandle, prompt: &str, conversation_id: &str) -> Result<String, String> {
     let mut conversation = match Conversation::from_id(conversation_id) {
         Ok(c) => c,
         Err(_) => Conversation::new()
@@ -74,7 +86,14 @@ async fn submit_prompt(prompt: &str, conversation_id: &str) -> Result<String, St
     match llm::queries::submit_prompt(prompt, &mut conversation).await {
         Ok(response) => {
             match conversation.save(conversation_id) {
-                Ok(_) => Ok(response),
+                Ok(_) => {
+                    match app_handle.emit_all("chat-response", ChatResponsePayload {
+                        response: response.clone()
+                    }) {
+                        Ok(_) => Ok(response),
+                        Err(e) => Err(e.to_string()),
+                    }
+                },
                 Err(e) => Err(e.to_string())
             }
         },
@@ -99,6 +118,43 @@ async fn main() -> Result<()> {
     }
 
     tauri::Builder::default()
+        .setup(|app| {
+            // let handle = app.handle();
+
+            // let id = app.listen_global("submit-prompt", |event| {
+            //     println!("got submit-prompt with payload {:?}", event.payload());
+ 
+            //     match event.payload() {
+            //         Some(payload) => {
+            //             let payload: Result<SubmitPromptPayload, serde_json::Error>  = serde_json::from_str(payload);
+            //             match payload {
+            //                 Ok(payload) => {
+            //                     let handle_clone = handle.clone();
+            //                     let process = tauri::async_runtime::spawn(async move {
+            //                         match submit_prompt(payload.prompt.as_str(), payload.conversation_id.as_str()).await {
+            //                             Ok(response) => {
+            //                                 handle_clone.emit_all("chat-response", payload);
+
+            //                                 // _app.emit_all(
+            //                                 //     "local-server-down",
+            //                                 //     ReceiveCodePayload {
+            //                                 //         code: String::from("test"),
+            //                                 //     },
+            //                                 // );
+            //                             },
+            //                             Err(e) => eprintln!("Error: {:?}", e),
+            //                         };
+            //                     });
+            //                 },
+            //                 Err(e) => eprintln!("Error: {:?}", e),
+            //             }
+            //         },
+            //         None => eprintln!("submit-prompt missing incoming payload."),
+            //     };
+            // });
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             // AWS Authentication
             export_credentials,
