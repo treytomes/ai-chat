@@ -3,12 +3,10 @@
 
 mod aws;
 
-use std::{env, fs};
-use std::{fs::File, io::BufReader, io::Write, path::Path};
+use std::env;
 
 use aws::models::{Credentials, Identity};
-use llm::models::{Conversation, Message};
-use serde::Serialize;
+use llm::models::{ChatResponsePayload, Conversation};
 use settings::AWS_PROFILE_NAME;
 use webbrowser::{open_browser, Browser};
 use aws::queries;
@@ -26,17 +24,6 @@ mod settings;
 use anyhow::Result;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-
-#[derive(Clone, serde::Serialize, serde::Deserialize)]
-struct SubmitPromptPayload {
-    prompt: String,
-    conversation_id: String,
-}
-
-#[derive(Clone, serde::Serialize, serde::Deserialize)]
-struct ChatResponsePayload {
-    response: String,
-}
 
 #[tauri::command(async)]
 async fn export_credentials(profile_name: &str) -> Result<Credentials, String> {
@@ -118,43 +105,6 @@ async fn main() -> Result<()> {
     }
 
     tauri::Builder::default()
-        .setup(|app| {
-            // let handle = app.handle();
-
-            // let id = app.listen_global("submit-prompt", |event| {
-            //     println!("got submit-prompt with payload {:?}", event.payload());
- 
-            //     match event.payload() {
-            //         Some(payload) => {
-            //             let payload: Result<SubmitPromptPayload, serde_json::Error>  = serde_json::from_str(payload);
-            //             match payload {
-            //                 Ok(payload) => {
-            //                     let handle_clone = handle.clone();
-            //                     let process = tauri::async_runtime::spawn(async move {
-            //                         match submit_prompt(payload.prompt.as_str(), payload.conversation_id.as_str()).await {
-            //                             Ok(response) => {
-            //                                 handle_clone.emit_all("chat-response", payload);
-
-            //                                 // _app.emit_all(
-            //                                 //     "local-server-down",
-            //                                 //     ReceiveCodePayload {
-            //                                 //         code: String::from("test"),
-            //                                 //     },
-            //                                 // );
-            //                             },
-            //                             Err(e) => eprintln!("Error: {:?}", e),
-            //                         };
-            //                     });
-            //                 },
-            //                 Err(e) => eprintln!("Error: {:?}", e),
-            //             }
-            //         },
-            //         None => eprintln!("submit-prompt missing incoming payload."),
-            //     };
-            // });
-
-            Ok(())
-        })
         .invoke_handler(tauri::generate_handler![
             // AWS Authentication
             export_credentials,
