@@ -37,11 +37,32 @@ export default function Markdown(props: MarkdownProps) {
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[rehypeRaw]}
       components={{
+        h1(props) {
+          return <>
+            <h1 className='text-5x pb-4'>{props.children}</h1>
+            <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+          </>
+        },
+        h2(props) {
+          return <h2 className='text-4xl pb-4'>{props.children}</h2>;
+        },
+        h3(props) {
+          return <h3 className='text-3xl pb-4'>{props.children}</h3>;
+        },
+        h4(props) {
+          return <h4 className='text-2xl pb-4'>{props.children}</h4>;
+        },
+        h5(props) {
+          return <h5 className='text-xl pb-4'>{props.children}</h5>;
+        },
         ul(props) {
-          return <ul {...props} className="list-group" />;
+          return <ul {...props} className="list-group list-disc">{props.children}</ul>;
+        },
+        ol(props) {
+          return <ol {...props} className="list-group list-decimal">{props.children}</ol>;
         },
         li(props) {
-          return <li {...props} className="list-group-item" />;
+          return <li {...props} className="list-group-item ml-8">{props.children}</li>;
         },
         pre(preProps) {
           const { children, ...rest } = preProps;
