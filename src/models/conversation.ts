@@ -4,7 +4,7 @@ import { Message } from "./message";
 export class Conversation {
     messages: Message[];
 
-    constructor(messages: Message[]) {
+    constructor(messages: Message[] = []) {
         this.messages = messages
     }
 
