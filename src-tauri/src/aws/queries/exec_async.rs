@@ -11,7 +11,7 @@ pub async fn exec_async(program: &str, args: &[&str]) -> Result<String, String> 
                 Ok(v) => v,
                 Err(e) => return Err(format!("Invalid UTF-8 sequence: {}", e)),
             };
-            if (stdout.len() > 0) {
+            if stdout.len() > 0 {
                 return Ok(stdout.to_string());
             }
             let stderr = match str::from_utf8(&out.stderr) {
