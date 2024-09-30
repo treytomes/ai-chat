@@ -12,31 +12,30 @@ import remarkGfm from 'remark-gfm';
 import Loader from './Loader';
 import { Mermaid } from './Mermaid';
 
-type MarkdownRequiredProps = {
+type MarkdownProps =   {
   text: string,
-}
 
-type MarkdownOptionalProps = {
   // Some output types won't be rendered until the loading phase is complete.
-  isLoading: boolean,
-  onRenderComplete: (() => void) | undefined,
-};
+  isLoading?: boolean,
+  
+  onRenderComplete?: (() => void),
+};;
 
-type MarkdownProps = MarkdownRequiredProps & MarkdownOptionalProps;
-
-const defaultProps: MarkdownOptionalProps = {
+export default function Markdown(props: MarkdownProps = {
+  text: '',
   isLoading: false,
-  onRenderComplete: undefined
-}
-
-export default function Markdown(props: MarkdownProps) {
-  props.isLoading 
+  onRenderComplete: undefined,
+}) {
   return (
     <ReactMarkdown
       children={props.text}
+      // skipHtml={true}
       remarkPlugins={[remarkGfm]}
       rehypePlugins={[rehypeRaw]}
       components={{
+        title(props) {
+          return <h1 className='text-5x pb-4 font-extrabold'>{props.children}</h1>
+        },
         h1(props) {
           return <>
             <h1 className='text-5x pb-4'>{props.children}</h1>
@@ -108,5 +107,3 @@ export default function Markdown(props: MarkdownProps) {
     />
   );
 };
-
-Markdown.defaultProps = defaultProps;

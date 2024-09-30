@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardHeader, Divider, Input, Textarea } from "@nextui-org/react";
+import { Button, Card, CardBody, CardFooter, CardHeader, Divider, Input, Textarea } from "@nextui-org/react";
 import { KeyboardEvent, KeyboardEventHandler, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as queries from "../../queries";
 import { v4 as uuidv4 } from 'uuid';
@@ -8,6 +8,8 @@ import { Message } from "../../models/message";
 import { ConversationRole } from "../../models/conversation-role";
 import { emit, listen } from '@tauri-apps/api/event';
 import { LoaderContext } from "../../context/LoaderContext";
+import { SubmitIcon } from "../../components/icons/SubmitIcon";
+import Sidebar from "../../components/Sidebar";
 
 type ChatResponse = {
     response: string,
@@ -28,6 +30,7 @@ export default function Chat() {
     // const [conversationId, setConversationId] = useState('');
     const [conversation, setConversation] = useState(new Conversation());
     const loaderContext = useContext(LoaderContext);
+    const promptRef = useRef(null);
 
     const conversationId = useMemo(() => {
         return 'aa1366a7-7f08-413f-94e8-445f71047ec2'; // uuidv4();
@@ -109,25 +112,32 @@ export default function Chat() {
     };
 
     return <div>
-        <div className="pb-16">
-            {conversation?.messages.map(message => <Card className="mb-4">
-                <CardHeader>
-                    <p className="text-large text-white font-bold">{message.role}</p>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                    <Markdown text={message.text} isLoading={false} onRenderComplete={undefined} />
-                </CardBody>
-            </Card>)}
+        <Sidebar />
 
-            <AlwaysScrollToBottom />
-        </div>
+        <div className="pl-64">
+            <div className="pb-32">
+                {conversation?.messages.map(message => <Card className="mb-4">
+                    <CardHeader>
+                        <p className="text-large text-white font-bold">{message.role}</p>
+                    </CardHeader>
+                    <Divider />
+                    <CardBody>
+                        <Markdown text={message.text} isLoading={false} onRenderComplete={undefined} />
+                    </CardBody>
+                </Card>)}
 
-        <div className="fixed bottom-0 left-0 w-full shadow-md-up z-50 px-0 py-0">
-            <Textarea label="prompt>" value={prompt} onValueChange={setPrompt} onKeyDown={handleInputKeyDown} />
-            <div className="flex justify-end">
-                <Button size="sm" color="primary" onPress={submitPrompt}>Submit</Button>
+                <AlwaysScrollToBottom />
             </div>
+
+            <Card isFooterBlurred className="fixed bottom-0 left-0 w-full shadow-md-up z-50 px-0 py-0">
+                <Textarea className="pb-8" label="prompt>" value={prompt} onValueChange={setPrompt} onKeyDown={handleInputKeyDown}
+                    classNames={{
+                        inputWrapper: "rounded-b-none"
+                    }} />
+                <CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 py-0 justify-end">
+                    <Button isIconOnly={true} size="sm" color="secondary" variant="flat" onPress={submitPrompt}><SubmitIcon /></Button>
+                </CardFooter>
+            </Card>
         </div>
     </div>
 }
