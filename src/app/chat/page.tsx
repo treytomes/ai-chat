@@ -1,13 +1,13 @@
-import { Button, Card, CardBody, CardHeader, Divider, Input } from "@nextui-org/react";
+import { Button, Card, CardBody, CardHeader, Divider, Input, Textarea } from "@nextui-org/react";
 import { KeyboardEvent, KeyboardEventHandler, useContext, useEffect, useMemo, useRef, useState } from "react";
-import * as queries from "../queries";
+import * as queries from "../../queries";
 import { v4 as uuidv4 } from 'uuid';
-import Markdown from "../components/Markdown";
-import { Conversation } from "../models/conversation";
-import { Message } from "../models/message";
-import { ConversationRole } from "../models/conversation-role";
+import Markdown from "../../components/Markdown";
+import { Conversation } from "../../models/conversation";
+import { Message } from "../../models/message";
+import { ConversationRole } from "../../models/conversation-role";
 import { emit, listen } from '@tauri-apps/api/event';
-import { LoaderContext } from "../context/LoaderContext";
+import { LoaderContext } from "../../context/LoaderContext";
 
 type ChatResponse = {
     response: string,
@@ -76,6 +76,9 @@ export default function Chat() {
 
     const submitPrompt = async () => {
         try {
+            if (!prompt) {
+                return;
+            }
             if (!conversation) {
                 throw new Error('Conversation is undefined.');
             }
@@ -100,13 +103,13 @@ export default function Chat() {
     }
 
     const handleInputKeyDown: KeyboardEventHandler<HTMLInputElement> = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && !event.shiftKey) {
             submitPrompt();
         }
     };
 
     return <div>
-        <div className="mb-16">
+        <div className="pb-16">
             {conversation?.messages.map(message => <Card className="mb-4">
                 <CardHeader>
                     <p className="text-large text-white font-bold">{message.role}</p>
@@ -120,11 +123,11 @@ export default function Chat() {
             <AlwaysScrollToBottom />
         </div>
 
-        <div className="fixed bottom-0 left-0 w-full shadow-md-up z-50 px-4 py-2 flex">
-            <Input classNames={{
-                inputWrapper: "rounded-r-none"
-            }} label="prompt>" value={prompt} onValueChange={setPrompt} onKeyDown={handleInputKeyDown} />
-            <Button color="primary" className="rounded-l-none h-14" onPress={submitPrompt}>Submit</Button>
+        <div className="fixed bottom-0 left-0 w-full shadow-md-up z-50 px-0 py-0">
+            <Textarea label="prompt>" value={prompt} onValueChange={setPrompt} onKeyDown={handleInputKeyDown} />
+            <div className="flex justify-end">
+                <Button size="sm" color="primary" onPress={submitPrompt}>Submit</Button>
+            </div>
         </div>
     </div>
 }

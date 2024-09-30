@@ -8,14 +8,14 @@ import {
   Selection,
   Spinner,
 } from "@nextui-org/react";
-import { Profile } from "../models";
-import { LoaderContext } from "../context/LoaderContext";
+import { Profile } from "../../models";
+import { LoaderContext } from "../../context/LoaderContext";
 import toast from "react-hot-toast";
-import { FailureIcon, SuccessIcon, UnknownIcon } from "../components/icons";
-import { openWebConsole } from "../queries";
-import { useInterval } from "../components/useInterval";
-import { IdentityTable } from "../components/IdentityTable";
-import { CredentialsTable } from "../components/CredentialsTable";
+import { FailureIcon, SuccessIcon, UnknownIcon } from "../../components/icons";
+import { openWebConsole } from "../../queries";
+import { useInterval } from "../../components/useInterval";
+import { IdentityTable } from "../../components/IdentityTable";
+import { CredentialsTable } from "../../components/CredentialsTable";
 
 export default function Profiles() {
   const [profiles, setProfiles] = useState<Profile[]>([]);

@@ -1,17 +1,15 @@
-import { Button, Input, Tab, Tabs } from "@nextui-org/react";
 import { useState } from "react";
-import Chat from "./chat";
-import Profiles from "./profiles";
+import AppNavbar from "../components/AppNavbar";
+import Profiles from "./profiles/page";
+import Chat from "./chat/page";
 
 export default function Home() {
+    const [selectedKey, setSelectedKey] = useState('chat');
+
     return <div>
-        <Tabs>
-            <Tab title="Chat">
-                <Chat />
-            </Tab>
-            <Tab title="Profiles">
-                <Profiles />
-            </Tab>
-        </Tabs>
+        <AppNavbar selectedKey={selectedKey} setSelectedKey={setSelectedKey} />
+
+        {selectedKey == 'chat' && <Chat />}
+        {selectedKey == 'profiles' && <Profiles />}
     </div>
 }
