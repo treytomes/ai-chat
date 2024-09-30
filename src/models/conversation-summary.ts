@@ -1,4 +1,4 @@
-import { listConversations } from "@/queries";
+import { listConversations } from "../queries";
 
 export class ConversationSummary {
     readonly id: string;

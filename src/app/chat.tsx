@@ -1,5 +1,5 @@
 import { Button, Card, CardBody, CardHeader, Divider, Input } from "@nextui-org/react";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { KeyboardEvent, KeyboardEventHandler, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as queries from "../queries";
 import { v4 as uuidv4 } from 'uuid';
 import Markdown from "../components/Markdown";
@@ -12,31 +12,26 @@ import { LoaderContext } from "../context/LoaderContext";
 type ChatResponse = {
     response: string,
 };
+const AlwaysScrollToBottom = () => {
+    const elementRef = useRef(null);
+    useEffect(() => {
+        if (!elementRef) return;
+        if (!elementRef.current) return;
+
+        (elementRef.current as HTMLDivElement).scrollIntoView()
+    });
+    return <div ref={elementRef} />;
+};
 
 export default function Chat() {
-    // const [response, setResponse] = useState('');
     const [prompt, setPrompt] = useState('');
     // const [conversationId, setConversationId] = useState('');
     const [conversation, setConversation] = useState(new Conversation());
     const loaderContext = useContext(LoaderContext);
 
     const conversationId = useMemo(() => {
-        return uuidv4();
+        return 'aa1366a7-7f08-413f-94e8-445f71047ec2'; // uuidv4();
     }, []);
-
-    useEffect(() => {
-        if (conversationId.length > 0) {
-            loaderContext.show("Where was I?");
-            queries.loadConversation(conversationId).then(c => {
-                console.log("Loaded conversation id:", conversationId);
-                setConversation(c);
-            }).catch((e: Error) => {
-                console.log(e);
-            }).finally(() => {
-                loaderContext.hide();
-            })
-        }
-    }, [conversationId]);
 
     // Subscribe to the chat-response tauri event.
     useEffect(() => {
@@ -65,6 +60,20 @@ export default function Chat() {
         }
     }, []);
 
+    useEffect(() => {
+        if (conversationId.length > 0) {
+            loaderContext.show("Where was I?");
+            queries.loadConversation(conversationId).then(c => {
+                console.log("Loaded conversation id:", conversationId);
+                setConversation(c);
+            }).catch((e: Error) => {
+                console.log(e);
+            }).finally(() => {
+                loaderContext.hide();
+            })
+        }
+    }, [conversationId]);
+
     const submitPrompt = async () => {
         try {
             if (!conversation) {
@@ -90,21 +99,31 @@ export default function Chat() {
         }
     }
 
-    return <div>
-        {conversation?.messages.map(message => <Card className="mb-4">
-            <CardHeader>
-                <p className="text-large text-white font-bold">{message.role}</p>
-            </CardHeader>
-            <Divider />
-            <CardBody>
-                <Markdown text={message.text} isLoading={false} onRenderComplete={undefined} />
-            </CardBody>
-        </Card>)}
+    const handleInputKeyDown: KeyboardEventHandler<HTMLInputElement> = (event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            submitPrompt();
+        }
+    };
 
-        <div className="flex">
+    return <div>
+        <div className="mb-16">
+            {conversation?.messages.map(message => <Card className="mb-4">
+                <CardHeader>
+                    <p className="text-large text-white font-bold">{message.role}</p>
+                </CardHeader>
+                <Divider />
+                <CardBody>
+                    <Markdown text={message.text} isLoading={false} onRenderComplete={undefined} />
+                </CardBody>
+            </Card>)}
+
+            <AlwaysScrollToBottom />
+        </div>
+
+        <div className="fixed bottom-0 left-0 w-full shadow-md-up z-50 px-4 py-2 flex">
             <Input classNames={{
                 inputWrapper: "rounded-r-none"
-            }} label="prompt>" value={prompt} onValueChange={setPrompt} />
+            }} label="prompt>" value={prompt} onValueChange={setPrompt} onKeyDown={handleInputKeyDown} />
             <Button color="primary" className="rounded-l-none h-14" onPress={submitPrompt}>Submit</Button>
         </div>
     </div>

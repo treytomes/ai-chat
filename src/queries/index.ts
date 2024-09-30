@@ -16,7 +16,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { delay } from "../util";
 import { Conversation } from "../models/conversation";
 import { ConversationDto } from "../models/conversation-dto";
-import { ConversationSummary } from "@/models/conversation-summary";
+import { ConversationSummary } from "../models/conversation-summary";
 
 
 const FEDERATION_URL = "https://signin.aws.amazon.com/federation";
