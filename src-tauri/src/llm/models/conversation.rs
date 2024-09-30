@@ -1,37 +1,31 @@
-use std::{fs::{self, File}, io::BufReader, io::Write, path::Path};
-
+use std::{fs::File, io::BufReader, io::Write, path::Path};
 use anyhow::Error;
-// use aws_sdk_bedrockruntime::types::{ContentBlock, ConversationRole, Message};
 use serde::{Deserialize, Serialize};
-
+use crate::llm::queries::get_conversation_path;
 use super::{ConversationRole, Message};
+// use aws_sdk_bedrockruntime::types::{ContentBlock, ConversationRole, Message};
 
 #[derive(Serialize, Deserialize)]
 pub struct Conversation {
+    id: String,
+    title: String,
     messages: Vec<Message>
 }
 
 impl Conversation {
     pub fn new() -> Self {
         Self {
+            id: "".to_string(),
+            title: "".to_string(),
             messages: vec![],
         }
-    }
-
-    fn get_path(id: &str) -> String {
-        let path = Path::new("conversations");
-        if !path.exists() {
-            let _ = fs::create_dir_all("conversations");
-        }
-        let path = path.join(format!("{}.json", id));
-        path.to_str().unwrap().to_string()
     }
 
     /**
      * Load a conversation from file, if it exists.
      */
     pub fn from_id(id: &str) -> Result<Self, Error> {
-        let path = Self::get_path(id);
+        let path = get_conversation_path(id);
     
         match Path::new(&path).exists() {
             true => {
@@ -47,10 +41,15 @@ impl Conversation {
         }
     }
 
-    pub fn save(&self, id: &str) -> Result<(), Error> {
+    pub fn save(&mut self, id: &str) -> Result<(), Error> {
+        self.id = id.to_string();
+        if self.title.is_empty() {
+            self.title = self.id.clone();
+        }
+
         match serde_json::to_string(&self) {
             Ok(json_text) => {
-                let path = Self::get_path(id);
+                let path = get_conversation_path(id);
 
                 let mut file = File::create(path)
                     .map_err(|e| Error::new(e))?;

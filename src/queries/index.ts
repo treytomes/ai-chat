@@ -16,6 +16,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { delay } from "../util";
 import { Conversation } from "../models/conversation";
 import { ConversationDto } from "../models/conversation-dto";
+import { ConversationSummary } from "@/models/conversation-summary";
 
 
 const FEDERATION_URL = "https://signin.aws.amazon.com/federation";
@@ -106,3 +107,8 @@ export const loadConversation = async (conversationId: string): Promise<Conversa
   const dto: ConversationDto = await invoke("load_conversation", { conversationId });
   return Conversation.fromDto(dto);
 };
+
+export const listConversations = async (): Promise<ConversationSummary[]> => {
+  const dto: ConversationSummaryDto[] = await invoke("list_conversations", {});
+  return dto.map(ConversationSummary.fromDto);
+}

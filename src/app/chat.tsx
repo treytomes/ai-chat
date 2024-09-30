@@ -22,13 +22,7 @@ export default function Chat() {
 
     const conversationId = useMemo(() => {
         return uuidv4();
-    }, [])
-
-    // useEffect(() => {
-    //     // const conversationId = '11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000';
-    //     const conversationId = uuidv4();
-    //     setConversationId(conversationId);
-    // }, []);
+    }, []);
 
     useEffect(() => {
         if (conversationId.length > 0) {

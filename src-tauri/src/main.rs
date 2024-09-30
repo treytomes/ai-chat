@@ -1,19 +1,9 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod aws;
-
-use std::env;
-
-use aws::models::{Credentials, Identity};
-use llm::models::{ChatResponsePayload, Conversation};
-use settings::AWS_PROFILE_NAME;
-use webbrowser::{open_browser, Browser};
-use aws::queries;
-use tauri::{AppHandle, Manager};
-
 extern crate ini;
 
+mod aws;
 mod chat_module;
 mod event_bus;
 mod llm;
@@ -21,7 +11,19 @@ mod logger_module;
 mod module;
 mod repl_module;
 mod settings;
+mod system;
+
 use anyhow::Result;
+
+use std::env;
+
+use aws::models::{Credentials, Identity};
+use llm::models::{ChatResponsePayload, Conversation, ConversationSummary};
+use settings::AWS_PROFILE_NAME;
+use webbrowser::{open_browser, Browser};
+use aws::queries;
+use tauri::{AppHandle, Manager};
+
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 
@@ -88,6 +90,14 @@ async fn submit_prompt(app_handle: AppHandle, prompt: &str, conversation_id: &st
     }
 }
 
+/**
+ * Get a list of conversation ids and names.
+ */
+#[tauri::command]
+async fn list_conversations() -> Vec<ConversationSummary> {
+    ConversationSummary::get_all()
+}
+
 #[tauri::command]
 async fn load_conversation(conversation_id: &str) -> Result<Conversation, String> {
     Conversation::from_id(conversation_id).map_err(|e| e.to_string())
@@ -113,8 +123,9 @@ async fn main() -> Result<()> {
             login,
 
             // AI Chat
-            submit_prompt,
+            list_conversations,
             load_conversation,
+            submit_prompt,
 
             // Misc
             open_url,

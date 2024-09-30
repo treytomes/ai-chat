@@ -1,5 +1,7 @@
 import { MessageDto } from "./message-dto"
 
 export type ConversationDto = {
-    messages: MessageDto[]
+    id: string,
+    title: string,
+    messages: MessageDto[],
 }
