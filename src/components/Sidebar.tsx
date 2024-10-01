@@ -5,16 +5,29 @@ import { useContext, useEffect, useState } from "react";
 import { ConversationContext } from "../context/ConversationContext";
 import { NewIcon } from "./icons/NewIcon";
 import { v4 as uuidv4 } from 'uuid';
+import { listen } from "@tauri-apps/api/event";
 
 export default function Sidebar() {
    const [conversations, setConversations] = useState<ConversationSummary[]>([]);
    const conversationContext = useContext(ConversationContext);
    
-   useEffect(() => {
+   const getConverationList = async () => {
       listConversations().then(result => {
          setConversations(result);
-      })
-   }, []);
+      });
+   }
+
+   useEffect(() => {
+      getConverationList();
+
+      const unlisten = listen<string>('chat-response', (_event) => {
+         getConverationList();
+      });
+
+      return () => {
+          unlisten.then(x => x());
+      }
+  }, []);
 
    const onSelectConversation = (conversationId: string) => {
       conversationContext.setConversationId(conversationId);

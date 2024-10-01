@@ -11,10 +11,8 @@ import { LoaderContext } from "../../context/LoaderContext";
 import { SubmitIcon } from "../../components/icons/SubmitIcon";
 import Sidebar from "../../components/Sidebar";
 import { ConversationContext } from "../../context/ConversationContext";
+import { ChatResponse } from "../../models/chat-response";
 
-type ChatResponse = {
-    response: string,
-};
 const AlwaysScrollToBottom = () => {
     const elementRef = useRef(null);
     useEffect(() => {
