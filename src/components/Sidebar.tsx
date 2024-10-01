@@ -1,8 +1,35 @@
+import { Link } from "@nextui-org/react";
+import { ConversationSummary } from "../models/conversation-summary";
+import { listConversations } from "../queries";
+import { useContext, useEffect, useState } from "react";
+import { ConversationContext } from "../context/ConversationContext";
+
 export default function Sidebar() {
-    return <aside id="default-sidebar" className="fixed top-16 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-    <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-       <ul className="space-y-2 font-medium">
-          <li>
+   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
+   const conversationContext = useContext(ConversationContext);
+   
+   useEffect(() => {
+      listConversations().then(result => {
+         setConversations(result);
+      })
+   }, []);
+
+   const onSelectConversation = (conversationId: string) => {
+      conversationContext.setConversationId(conversationId);
+   }
+
+   // Removing "sm:translate-x-0" slides the menu away?
+   return <aside id="default-sidebar" className="fixed top-16 left-0 z-40 w-64 bottom-32 transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+      <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+         <ul className="space-y-2 font-medium">
+            {conversations.map(mi => <li key={mi.id}>
+               <Link onClick={() => onSelectConversation(mi.id)}>
+                  <div className="text-xs">
+                     {mi.title}
+                  </div>
+               </Link>
+            </li>)}
+          {/* <li>
              <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                 <svg className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
                    <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
@@ -62,8 +89,8 @@ export default function Sidebar() {
                 </svg>
                 <span className="flex-1 ms-3 whitespace-nowrap">Sign Up</span>
              </a>
-          </li>
-       </ul>
-    </div>
- </aside>
+          </li> */}
+         </ul>
+      </div>
+   </aside>
 }

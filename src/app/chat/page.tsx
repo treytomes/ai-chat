@@ -10,6 +10,7 @@ import { emit, listen } from '@tauri-apps/api/event';
 import { LoaderContext } from "../../context/LoaderContext";
 import { SubmitIcon } from "../../components/icons/SubmitIcon";
 import Sidebar from "../../components/Sidebar";
+import { ConversationContext } from "../../context/ConversationContext";
 
 type ChatResponse = {
     response: string,
@@ -27,17 +28,14 @@ const AlwaysScrollToBottom = () => {
 
 export default function Chat() {
     const [prompt, setPrompt] = useState('');
-    // const [conversationId, setConversationId] = useState('');
     const [conversation, setConversation] = useState(new Conversation());
     const loaderContext = useContext(LoaderContext);
-    const promptRef = useRef(null);
-
-    const conversationId = useMemo(() => {
-        return 'aa1366a7-7f08-413f-94e8-445f71047ec2'; // uuidv4();
-    }, []);
+    const conversationContext = useContext(ConversationContext);
 
     // Subscribe to the chat-response tauri event.
     useEffect(() => {
+        conversationContext.setConversationId(uuidv4());
+
         const unlisten = listen<string>('chat-response', (event) => {
             console.log('Got event:', event);
             const response: ChatResponse = event.payload as any;
@@ -64,10 +62,10 @@ export default function Chat() {
     }, []);
 
     useEffect(() => {
-        if (conversationId.length > 0) {
+        if (conversationContext.conversationId.length > 0) {
             loaderContext.show("Where was I?");
-            queries.loadConversation(conversationId).then(c => {
-                console.log("Loaded conversation id:", conversationId);
+            queries.loadConversation(conversationContext.conversationId).then(c => {
+                console.log("Loaded conversation id:", conversationContext.conversationId);
                 setConversation(c);
             }).catch((e: Error) => {
                 console.log(e);
@@ -75,7 +73,7 @@ export default function Chat() {
                 loaderContext.hide();
             })
         }
-    }, [conversationId]);
+    }, [conversationContext.conversationId]);
 
     const submitPrompt = async () => {
         try {
