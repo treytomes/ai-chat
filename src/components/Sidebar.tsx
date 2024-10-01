@@ -1,8 +1,10 @@
-import { Link } from "@nextui-org/react";
+import { Button, Link, Tooltip } from "@nextui-org/react";
 import { ConversationSummary } from "../models/conversation-summary";
 import { listConversations } from "../queries";
 import { useContext, useEffect, useState } from "react";
 import { ConversationContext } from "../context/ConversationContext";
+import { NewIcon } from "./icons/NewIcon";
+import { v4 as uuidv4 } from 'uuid';
 
 export default function Sidebar() {
    const [conversations, setConversations] = useState<ConversationSummary[]>([]);
@@ -18,13 +20,22 @@ export default function Sidebar() {
       conversationContext.setConversationId(conversationId);
    }
 
+   const onNewChatSession = () => {
+      conversationContext.setConversationId(uuidv4());
+   }
+
    // Removing "sm:translate-x-0" slides the menu away?
-   return <aside id="default-sidebar" className="fixed top-16 left-0 z-40 w-64 bottom-32 transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+   return <aside id="default-sidebar" className="fixed top-16 bg-zinc-800 left-0 z-40 w-64 bottom-0 transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
       <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+         <div className="flex place-content-end">
+            <Tooltip content="Begin a new chat session.">
+               <Button className="place-self-end" size="sm" isIconOnly={true} data-tooltip-target="tooltip-default" onPress={onNewChatSession}><NewIcon /></Button>
+            </Tooltip>
+         </div>
          <ul className="space-y-2 font-medium">
             {conversations.map(mi => <li key={mi.id}>
-               <Link onClick={() => onSelectConversation(mi.id)}>
-                  <div className="text-xs">
+               <Link className="text-s text-white hover:bg-zinc-500 rounded-md p-2" onClick={() => onSelectConversation(mi.id)}>
+                  <div>
                      {mi.title}
                   </div>
                </Link>

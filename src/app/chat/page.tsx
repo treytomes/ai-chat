@@ -63,17 +63,23 @@ export default function Chat() {
 
     useEffect(() => {
         if (conversationContext.conversationId.length > 0) {
+            console.log('Loading new conversation.', conversationContext.conversationId);
             loaderContext.show("Where was I?");
             queries.loadConversation(conversationContext.conversationId).then(c => {
                 console.log("Loaded conversation id:", conversationContext.conversationId);
                 setConversation(c);
             }).catch((e: Error) => {
                 console.log(e);
+                setConversation(new Conversation(conversationContext.conversationId));
             }).finally(() => {
                 loaderContext.hide();
             })
         }
     }, [conversationContext.conversationId]);
+
+    useEffect(() => {
+        console.log('Reloading conversation.');
+    }, [conversation]);
 
     const submitPrompt = async () => {
         try {
@@ -127,7 +133,7 @@ export default function Chat() {
                 <AlwaysScrollToBottom />
             </div>
 
-            <Card isFooterBlurred className="fixed bottom-0 left-0 w-full shadow-md-up z-50 px-0 py-0">
+            <Card isFooterBlurred className="fixed bottom-0 left-64 w-[calc(100%-16rem)] shadow-md-up z-50">
                 <Textarea className="pb-8" label="prompt>" value={prompt} onValueChange={setPrompt} onKeyDown={handleInputKeyDown}
                     classNames={{
                         inputWrapper: "rounded-b-none"

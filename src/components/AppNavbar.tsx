@@ -1,4 +1,4 @@
-import { Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/react";
+import { Link, Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, NavbarMenuToggle } from "@nextui-org/react";
 import { Logo } from "./icons/Logo";
 import { useContext, useEffect, useState } from "react";
 import { ConversationContext } from "../context/ConversationContext";
@@ -12,16 +12,23 @@ type AppNavbarProps = {
 export default function AppNavbar(props: AppNavbarProps) {
     const conversationContext = useContext(ConversationContext);
     const [conversationTitle, setConversationTitle] = useState<string>('');
+    // const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
-        loadConversation(conversationContext.conversationId).then(c => setConversationTitle(c.title));
+        loadConversation(conversationContext.conversationId)
+            .then(c => setConversationTitle(c.title))
+            .catch(_e => setConversationTitle('New Conversation'));
     }, [conversationContext.conversationId]);
     
+    // return <Navbar onMenuOpenChange={setIsMenuOpen}>
     return <Navbar>
-        <NavbarBrand>
-            <Logo />
-            <p className="font-bold text-inherit">AI Chat</p>
-        </NavbarBrand>
+        <NavbarContent>
+            {/* <NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} /> */}
+            <NavbarBrand>
+                <Logo />
+                <p className="font-bold text-inherit">AI Chat</p>
+            </NavbarBrand>
+        </NavbarContent>
         <NavbarContent>
             <NavbarItem>
                 <p className="font-bold text-inherit">{conversationTitle}</p>
@@ -39,6 +46,7 @@ export default function AppNavbar(props: AppNavbarProps) {
                 </Link>
             </NavbarItem>
         </NavbarContent>
+
         {/* <NavbarContent justify="end">
             <NavbarItem className="hidden lg:flex">
                 <Link href="#">Login</Link>
@@ -49,5 +57,18 @@ export default function AppNavbar(props: AppNavbarProps) {
                 </Button>
             </NavbarItem>
         </NavbarContent> */}
+
+        {/* <NavbarMenu className="bg-red-500 fixed w-64 h-64">
+            <NavbarMenuItem>
+                <Link color="foreground" href="#" size="lg" className="w-full" aria-current={props.selectedKey === 'chat' ? 'page' : undefined} onClick={() => props.setSelectedKey("chat")}>
+                    Chat
+                </Link>
+            </NavbarMenuItem>
+            <NavbarMenuItem>
+                <Link color="foreground" href="#" size="lg" className="w-full" aria-current={props.selectedKey === 'profiles' ? 'page' : undefined} onClick={() => props.setSelectedKey("profiles")}>
+                    Profiles
+                </Link>
+            </NavbarMenuItem>
+        </NavbarMenu> */}
     </Navbar>
 }

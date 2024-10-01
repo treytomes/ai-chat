@@ -9,7 +9,9 @@ use super::{ConversationRole, Message};
 pub struct Conversation {
     id: String,
     title: String,
-    messages: Vec<Message>
+    messages: Vec<Message>,
+    createdDate: String,
+    lastModifiedDate: String,
 }
 
 impl Conversation {
@@ -18,6 +20,8 @@ impl Conversation {
             id: "".to_string(),
             title: "".to_string(),
             messages: vec![],
+            createdDate: "".to_string(),
+            lastModifiedDate: "".to_string(),
         }
     }
 
