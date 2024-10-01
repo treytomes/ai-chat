@@ -1,3 +1,5 @@
+use crate::system::queries::get_timestamp;
+
 use super::ConversationRole;
 use serde::{Deserialize, Serialize};
 use aws_sdk_bedrockruntime::types::{ContentBlock, Message as BedrockMessage};
@@ -5,8 +7,10 @@ use anyhow::Error;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Message {
+    // id: String,
     role: ConversationRole,
     text: String,
+    created_date: String,
 }
 
 impl Message {
@@ -14,6 +18,7 @@ impl Message {
         Self {
             role,
             text,
+            created_date: get_timestamp(),
         }
     }
 

@@ -1,7 +1,8 @@
 use std::{fs::File, io::BufReader, io::Write, path::Path};
 use anyhow::Error;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use crate::llm::queries::{generate_title, get_conversation_path};
+use crate::{llm::queries::{generate_title, get_conversation_path}, system::queries::get_timestamp};
 use super::{ConversationRole, Message};
 // use aws_sdk_bedrockruntime::types::{ContentBlock, ConversationRole, Message};
 
@@ -10,8 +11,8 @@ pub struct Conversation {
     id: String,
     title: String,
     messages: Vec<Message>,
-    createdDate: String,
-    lastModifiedDate: String,
+    created_date: String,
+    last_modified_date: String,
 }
 
 impl Conversation {
@@ -20,8 +21,8 @@ impl Conversation {
             id: "".to_string(),
             title: "".to_string(),
             messages: vec![],
-            createdDate: "".to_string(),
-            lastModifiedDate: "".to_string(),
+            created_date: get_timestamp(),
+            last_modified_date: get_timestamp(),
         }
     }
 
@@ -46,6 +47,7 @@ impl Conversation {
     }
 
     pub async fn save(&mut self, id: &str) -> Result<(), Error> {
+        self.last_modified_date = get_timestamp();
         self.id = id.to_string();
         if self.title.is_empty() || self.title == self.id {
             println!("Preparing to generate title...");
