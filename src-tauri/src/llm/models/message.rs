@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use aws_sdk_bedrockruntime::types::{ContentBlock, Message as BedrockMessage};
 use anyhow::Error;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Message {
     role: ConversationRole,
     text: String,

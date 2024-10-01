@@ -1,11 +1,11 @@
 use std::{fs::File, io::BufReader, io::Write, path::Path};
 use anyhow::Error;
 use serde::{Deserialize, Serialize};
-use crate::llm::queries::get_conversation_path;
+use crate::llm::queries::{generate_title, get_conversation_path};
 use super::{ConversationRole, Message};
 // use aws_sdk_bedrockruntime::types::{ContentBlock, ConversationRole, Message};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Conversation {
     id: String,
     title: String,
@@ -41,10 +41,15 @@ impl Conversation {
         }
     }
 
-    pub fn save(&mut self, id: &str) -> Result<(), Error> {
+    pub async fn save(&mut self, id: &str) -> Result<(), Error> {
         self.id = id.to_string();
-        if self.title.is_empty() {
-            self.title = self.id.clone();
+        if self.title.is_empty() || self.title == self.id {
+            println!("Preparing to generate title...");
+            self.title = match generate_title(self).await {
+                Ok(title) => title,
+                Err(_) => self.id.clone(),
+            };
+            println!("Here it is: {}", self.title);
         }
 
         match serde_json::to_string(&self) {

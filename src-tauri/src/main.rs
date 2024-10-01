@@ -74,7 +74,7 @@ async fn submit_prompt(app_handle: AppHandle, prompt: &str, conversation_id: &st
 
     match llm::queries::submit_prompt(prompt, &mut conversation).await {
         Ok(response) => {
-            match conversation.save(conversation_id) {
+            match conversation.save(conversation_id).await {
                 Ok(_) => {
                     match app_handle.emit_all("chat-response", ChatResponsePayload {
                         response: response.clone()

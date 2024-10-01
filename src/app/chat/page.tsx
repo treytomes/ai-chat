@@ -95,7 +95,7 @@ export default function Chat() {
             //     console.log('Message: ', message);
             // }
 
-            await queries.submitPrompt(cachedPrompt, conversationId);
+            await queries.submitPrompt(cachedPrompt, conversation.id);
 
             // await emit('submit-prompt', { prompt: cachedPrompt, conversation_id: conversationId });
         } catch (e) {
@@ -114,7 +114,7 @@ export default function Chat() {
 
         <div className="pl-64">
             <div className="pb-32">
-                {conversation?.messages.map(message => <Card className="mb-4">
+                {conversation?.messages.map((message, index) => <Card key={index} className="mb-4">
                     <CardHeader>
                         <p className="text-large text-white font-bold">{message.role}</p>
                     </CardHeader>

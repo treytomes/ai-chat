@@ -34,25 +34,25 @@ export default function Markdown(props: MarkdownProps = {
       rehypePlugins={[rehypeRaw]}
       components={{
         title(props) {
-          return <h1 className='text-5x pb-4 font-extrabold'>{props.children}</h1>
+          return <div className='text-5x pb-4 font-extrabold'>{props.children}</div>
         },
         h1(props) {
           return <>
-            <h1 className='text-5x pb-4'>{props.children}</h1>
+            <div className='text-5x pb-4'>{props.children}</div>
             <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700"></hr>
           </>
         },
         h2(props) {
-          return <h2 className='text-4xl pb-4'>{props.children}</h2>;
+          return <div className='text-4xl pb-4'>{props.children}</div>;
         },
         h3(props) {
-          return <h3 className='text-3xl pb-4'>{props.children}</h3>;
+          return <div className='text-3xl pb-4'>{props.children}</div>;
         },
         h4(props) {
-          return <h4 className='text-2xl pb-4'>{props.children}</h4>;
+          return <div className='text-2xl pb-4'>{props.children}</div>;
         },
         h5(props) {
-          return <h5 className='text-xl pb-4'>{props.children}</h5>;
+          return <div className='text-xl pb-4'>{props.children}</div>;
         },
         ul(props) {
           return <ul {...props} className="list-group list-disc">{props.children}</ul>;
